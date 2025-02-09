@@ -41,8 +41,9 @@ The **project:** consists of multiple applications. An application should be in 
 <br>
 
 **source/helm:** let you add options regarding helm <br>
-- **source/helm/releaseName:** The name f the release
+- **source/helm/releaseName:** The name of the release
 - **source/helm/valueFiles:** Reference to a value file
+
 **source/repoUrl:** is the url of our git repository that we want to use as a source <br>
 **source/path:** the path that I want to use as the source, as the group of manifests. The path of the helm charts that I want to deploy <br>
 **source/targetRevision:** We can use a branch name, or a commit id or a tag name. <br>
