@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application-directory
+spec:
+  destination: # Where the application is deployed
+    namespace: directory
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    directory:
+      include: "serviceaccount.yaml"
+    path: 03-argocd-applications/directoryofmanifests
+    repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+    targetRevision: main
