@@ -4,9 +4,9 @@ Under **spec/destination** we are telling Argo where to deploy the application <
 - **/spec/destination/server** the server on which the application should be deployed <br>
 <br>
 To get the server run **argocd cluster list --grpc-web** <br>
-      argocd cluster list --grpc-web
-      SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
-      https://kubernetes.default.svc  in-cluster  1.27     Successful
+  argocd cluster list --grpc-web
+    SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
+    https://kubernetes.default.svc  in-cluster  1.27     Successful
 
 The server name **https://kubernetes.default.svc** is because ArgoCD has a controller that lives in the default kubernetes cluster, in current cluster. <br>
 ArgoCD is able to connect to remote clusters as well. <br>
