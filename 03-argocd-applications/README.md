@@ -16,7 +16,7 @@ The server name **https://kubernetes.default.svc** is because ArgoCD has a contr
 ArgoCD is able to connect to remote clusters as well. <br>
 **https://kubernetes.default.svc** Is the server name/address of our current and default kubernetes cluster. <br>
 <br>
-The **project:** consists of multiple applications. An application should be in a **project:**, so it isnecessary to define a project name for our application
+The **project:** consists of multiple applications. An application should be in a **project:**, so it is necessary to define a project name for our application
 <br>
 <br>
 
