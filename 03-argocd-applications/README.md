@@ -66,6 +66,6 @@ The **project:** consists of multiple applications. An application should be in 
         server: "https://kubernetes.default.svc"
         namespace: default
 
-**spec/source/repoURL:** Here we are using a helm repository intead of a git repository.
-**spec/source/chart:** This is the chart name the we want to use from the repository.
-**spec/source/targetRevision:** This is the version of the chart
+**spec/source/repoURL:** Here we are using a helm repository intead of a git repository. <br>
+**spec/source/chart:** This is the chart name the we want to use from the repository. <br>
+**spec/source/targetRevision:** This is the version of the chart.
