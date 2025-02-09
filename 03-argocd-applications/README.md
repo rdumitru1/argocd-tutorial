@@ -1,6 +1,6 @@
 To login with argocd cli run **argocd login [cluster_hostname] --insecure --grpc-web** <br>
 
-***application-1.yaml***
+***helm/application-1.yaml***
 
     apiVersion: argoproj.io/v1alpha1
     kind: Application
@@ -48,7 +48,7 @@ The **project:** consists of multiple applications. An application should be in 
 **source/path:** the path that I want to use as the source, as the group of manifests. The path of the helm charts that I want to deploy <br>
 **source/targetRevision:** We can use a branch name, or a commit id or a tag name. <br>
 
-***application-2.yaml***
+***helm/application-2.yaml***
 
     apiVersion: argoproj.io/v1alpha1
     kind: Application
@@ -69,4 +69,4 @@ The **project:** consists of multiple applications. An application should be in 
 
 **spec/source/repoURL:** Here we are using a helm repository intead of a git repository. <br>
 **spec/source/chart:** This is the chart name the we want to use from the repository. <br>
-**spec/source/targetRevision:** This is the version of the chart.
+**spec/source/targetRevision:** This is the revision/version of the chart.
