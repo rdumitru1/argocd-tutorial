@@ -2,6 +2,7 @@ To login with argocd cli run **argocd login [cluster_hostname] --insecure --grpc
 Under **spec/destination** we are telling Argo where to deploy the application <br>
 - **/spec/destination/namespace** the namespace where the application is deployed <br>
 - **/spec/destination/server** the server on which the application should be deployed <br>
+<br>
 To get the server run **argocd cluster list --grpc-web** <br>
     argocd cluster list --grpc-web
     SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
