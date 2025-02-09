@@ -72,7 +72,7 @@ The **project:** consists of multiple applications. An application should be in 
 **spec/source/targetRevision:** This is the revision/version of the chart. <br>
 
 
-## Using ***directory*** for plain manifest files. <br>
+## Deploy plain manifest files. <br>
 
     apiVersion: argoproj.io/v1alpha1
     kind: Application
