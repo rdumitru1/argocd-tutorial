@@ -85,7 +85,7 @@ The **project:** consists of multiple applications. An application should be in 
       project: default
       source:
         directory:
-          include: "serviceaccount.yaml"
+          recurse: true
         path: 03-argocd-applications/directoryofmanifests
         repoURL: https://github.com/rdumitru1/argocd-tutorial.git
         targetRevision: main
