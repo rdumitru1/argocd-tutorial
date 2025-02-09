@@ -4,6 +4,7 @@ Under **spec/destination** we are telling Argo where to deploy the application <
 - **/spec/destination/server** the server on which the application should be deployed <br>
 <br>
 To get the server run **argocd cluster list --grpc-web** <br>
+
 ```bash
   argocd cluster list --grpc-web
   SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
