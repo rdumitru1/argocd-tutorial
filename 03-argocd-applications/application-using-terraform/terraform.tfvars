@@ -1,0 +1,11 @@
+username              = "admin"
+password              = "NfpgJVBed0pt66Iz"
+server_addr           = "darkscience.local"
+namespace             = "argocd"
+repo_url              = "https://github.com/rdumitru1/argocd-tutorial.git"
+path                  = "03-argocd-applications/helm/nginx"
+target_revision       = "main"
+values_files          = ["custom-values.yaml"]
+destination_namespace = "terraform"
+destination_server    = "https://kubernetes.default.svc"
+insecure              = true
