@@ -91,7 +91,7 @@ To list all projects: <br>
 In the default project there are no restrictions, we cab use all repositories, all destionations and all resources for our application. <br>
 <br>
 <br>
-Create a new project:
+Create a new project using **sourceRepos** block to allow only 1 repo: <br>
 **project-1.yaml** <br>
 
     apiVersion: argoproj.io/v1alpha1
@@ -142,7 +142,7 @@ Change the repoURL to the allowed git repository and redeployit. <br>
         repoURL: https://github.com/rdumitru1/argocd-tutorial.git
         targetRevision: main
 
-Allowing all repositories except: <br>
+Create a new project using **sourceRepos** block to allow all repositories except the one with **\!** in front: <br>
 **project-2.yaml** <br>
 
     apiVersion: argoproj.io/v1alpha1
