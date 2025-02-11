@@ -32,10 +32,12 @@ Each applications must belong to a project and by default each application uses 
         server: '*'
   To deploy the application in the dev namespace and to the local server. <br>
   All other namespaces are not allowed. <br>
+
         namespace: 'dev'
         server: 'https://kubernetes.default.svc'
   To deploy the application on all namespaces but not on dev namespace, and to any server. <br>
   You are not allow to deploy it on the dev namespace. <br>
+
         namespace: '!dev'
         server: 'https://kubernetes.default.svc'
 
