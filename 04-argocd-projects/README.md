@@ -93,6 +93,7 @@ In the default project there are no restrictions, we cab use all repositories, a
 <br>
 Create a new project:
 - **project-1.yaml**
+
     apiVersion: argoproj.io/v1alpha1
     kind: AppProject
     metadata:
@@ -110,6 +111,7 @@ Create a new project:
   Here we are limiting the project to allow only **https://github.com/rdumitru1/argocd-tutorial** repo.
 Create a new app:
 - **app-1.yaml**
+
     apiVersion: argoproj.io/v1alpha1
     kind: Application
     metadata:
@@ -125,6 +127,7 @@ Create a new app:
         targetRevision: main
 Now if you check the ArgoCD web interface you should see this error **application repo https://github.com/mohammadll/argo-tutorial.git is not permitted in project 'project-1'** <br>
 Change the repoURL to the allowed git repository and redeployit. <br>
+
     apiVersion: argoproj.io/v1alpha1
     kind: Application
     metadata:
@@ -140,6 +143,7 @@ Change the repoURL to the allowed git repository and redeployit. <br>
         targetRevision: main
 Allowing all repositories except: <br>
 - **project-2.yaml**
+
     apiVersion: argoproj.io/v1alpha1
     kind: AppProject
     metadata:
