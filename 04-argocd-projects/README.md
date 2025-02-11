@@ -101,11 +101,11 @@ Create a new project:
       namespace: argocd
     spec:
       clusterResourceWhitelist:
-        - group: "*"
-          kind: "*"
+        - group: "\*"
+          kind: "\*"
       destinations:
-        - namespace: "*"
-          server: "*"
+        - namespace: "\*"
+          server: "\*"
       sourceRepos:
         - "https://github.com/rdumitru1/argocd-tutorial"
   Here we are limiting the project to allow only **https://github.com/rdumitru1/argocd-tutorial** repo.
@@ -152,10 +152,10 @@ Allowing all repositories except: <br>
     spec:
       clusterResourceWhitelist:
         - group: "*"
-          kind: "*"
+          kind: "\*"
       destinations:
-        - namespace: "*"
-          server: "*"
+        - namespace: "\*"
+          server: "\*"
       sourceRepos:
         - "!https://github.com/rdumitru1/argocd-tutorial"       // Except this repository
-        - "*"                                                   // Allow all repositories
+        - "\*"                                                   // Allow all repositories
