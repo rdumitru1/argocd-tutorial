@@ -1,5 +1,6 @@
 **projects** provide a logical grouping of applications, which is useful when Argo CD is used by multiple teams. <br>
-**projects** provide the following features <br>
+Each applications must belong to a project and by default each application uses a project called default. <br>
+**projects** provide the following features: <br>
 - **Restrict what may be deployed** (trusted Git source repositories). You can specify to an application what repo to use and it use the **sourceRepo** block. <br>
   Lets presume that we have **application1**, and I want that my **application1** uses only this repository **https://github.com/rdumitru1/argocd-tutorial.git**. <br>
 
@@ -16,4 +17,141 @@
 
       sourceRepos:
         !https://github.com/rdumitru1/argocd-tutorial.git
-        "*"
+        '*'
+
+- **Restrict where apps may be deployed to** (destination clusters and namespaces). You can specify the namespace and server where the application will be deployed. <br>
+  Deploy a application to any namespace, and any server. <br>
+
+      destination:
+        namespace: '*'
+        server: '*'
+  To deploy the application in the dev namespace and to be able to deploy it to any server. <br>
+  All other namespaces are not allowed. <br>
+      destination:
+        namespace: 'dev'
+        server: '*'
+  To deploy the application in the dev namespace and to the local server. <br>
+  All other namespaces are not allowed. <br>
+        namespace: 'dev'
+        server: 'https://kubernetes.default.svc'
+  To deploy the application on all namespaces but not on dev namespace, and to any server. <br>
+  You are not allow to deploy it on the dev namespace. <br>
+        namespace: '!dev'
+        server: 'https://kubernetes.default.svc'
+
+- **Restrict what kinds of objects may or may not be deployed**    (e.g. RBAC, CRDs, DaemonSets, NetworkPolicy etc...) <br>
+  To do that we are using **clusterResourceWhitelist**, **namespaceResourceWhitelist**, **clusterResourceBlacklist** and **namespaceResourceBlacklist** blocks. <br>
+  Both blocks have 2 different fields **group** and **kind**. <br>
+
+    clusterResourceWhitelist:
+      - group: ""
+        kind: "Namespace"
+
+    namespaceResourceWhitelist:
+      - group: "apps"
+        kind: "Deployment"
+
+  The **clusterResourceWhitelist/Blacklist** block accepts cluster scope resources like **namespaces**. <br>
+  The **namespaceResourceWhitelist/Blacklist** block accepts namespaced scope resources like **Deployments**. <br>
+  Since both blocks are about whitelist, this means that in the above example, my application can use **Namespace** resource but we are not allowed to use all other resources as a
+  cluster scope resource, and it can use only **Deployment** but we are not allowed to use all other resources as a namespace scope resource. <br>
+
+    namespaceResourceBlacklist:
+      - group: "apps"
+        kind: "Deployment"
+  In the above example we are specifying that I can't use **Deployment** resources, but I can use all other namespaced resources. <br>
+
+To list all projects: <br>
+
+    kubectl get appproject
+    NAME      AGE
+    default   6d
+**default** this is the default project of ArgoCD, if you do not create a project, our application can use this project as their project. <br>
+
+    kubectl get appproject default -o yaml
+    apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+      creationTimestamp: "2025-02-04T12:24:57Z"
+      generation: 1
+      name: default
+      namespace: argocd
+      resourceVersion: "10078"
+      uid: cdf40985-cc1f-43a4-8ba6-daf7f70fdc79
+    spec:
+      clusterResourceWhitelist:
+      - group: '*'
+        kind: '*'
+      destinations:
+      - namespace: '*'
+        server: '*'
+      sourceRepos:
+      - '*'
+    status: {}
+In the default project there are no restrictions, we cab use all repositories, all destionations and all resources for our application. <br>
+<br>
+<br>
+Create a new project:
+- **project-1.yaml**
+    apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+      name: project-1
+      namespace: argocd
+    spec:
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      destinations:
+        - namespace: "*"
+          server: "*"
+      sourceRepos:
+        - "https://github.com/rdumitru1/argocd-tutorial"
+  Here we are limiting the project to allow only **https://github.com/rdumitru1/argocd-tutorial** repo.
+Create a new app:
+- **app-1.yaml**
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: app-1
+    spec:
+      destination: # Where the application is deployed
+        namespace: default
+        server: https://kubernetes.default.svc
+      project: project-1      // Uses the above created project-1 project
+      source:
+        path: argo-cd/applications/helm/nginx
+        repoURL: https://github.com/mohammadll/argo-tutorial.git      // This will fail because is using other repo than is allowed in the project-1 project
+        targetRevision: main
+Now if you check the ArgoCD web interface you should see this error **application repo https://github.com/mohammadll/argo-tutorial.git is not permitted in project 'project-1'** <br>
+Change the repoURL to the allowed git repository and redeployit. <br>
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: app-1
+    spec:
+      destination: # Where the application is deployed
+        namespace: default
+        server: https://kubernetes.default.svc
+      project: project-1
+      source:
+        path: 03-argocd-applications/helm/nginx
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+Allowing all repositories except: <br>
+- **project-2.yaml**
+    apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+      name: project-2
+      namespace: argocd
+    spec:
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      destinations:
+        - namespace: "*"
+          server: "*"
+      sourceRepos:
+        - "!https://github.com/rdumitru1/argocd-tutorial"       // Except this repository
+        - "*"                                                   // Allow all repositories

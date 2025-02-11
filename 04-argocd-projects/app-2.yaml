@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-2
+spec:
+  destination: # Where the application is deployed
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: project-2
+  source:
+    path: argo-cd/applications/helm/nginx
+    repoURL: https://github.com/mohammadll/argo-tutorial.git
+    targetRevision: main
