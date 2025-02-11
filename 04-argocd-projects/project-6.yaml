@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: project-6
+  namespace: argocd
+spec:
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: "ServiceAccount" # Only this resource can be deployed, all other resources can't be deployed'
+  destinations:
+    - namespace: "*"
+      server: "*"
+  sourceRepos:
+    - "*"
