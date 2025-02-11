@@ -1,7 +1,7 @@
 **projects** provide a logical grouping of applications, which is useful when Argo CD is used by multiple teams. <br>
 Each applications must belong to a project and by default each application uses a project called default. <br>
 **projects** provide the following features: <br>
-- **Restrict what may be deployed** (trusted Git source repositories). You can specify to an application what repo to use and it use the **sourceRepo** block. <br>
+**Restrict what may be deployed** (trusted Git source repositories). You can specify to an application what repo to use and it use the **sourceRepo** block. <br>
   Lets presume that we have **application1**, and I want that my **application1** uses only this repository **https://github.com/rdumitru1/argocd-tutorial.git**. <br>
 
       sourceRepos:
@@ -19,7 +19,7 @@ Each applications must belong to a project and by default each application uses 
         !https://github.com/rdumitru1/argocd-tutorial.git
         '*'
 
-- **Restrict where apps may be deployed to** (destination clusters and namespaces). You can specify the namespace and server where the application will be deployed. <br>
+**Restrict where apps may be deployed to** (destination clusters and namespaces). You can specify the namespace and server where the application will be deployed. <br>
   Deploy a application to any namespace, and any server. <br>
 
       destination:
@@ -39,7 +39,7 @@ Each applications must belong to a project and by default each application uses 
         namespace: '!dev'
         server: 'https://kubernetes.default.svc'
 
-- **Restrict what kinds of objects may or may not be deployed**    (e.g. RBAC, CRDs, DaemonSets, NetworkPolicy etc...) <br>
+**Restrict what kinds of objects may or may not be deployed**    (e.g. RBAC, CRDs, DaemonSets, NetworkPolicy etc...) <br>
   To do that we are using **clusterResourceWhitelist**, **namespaceResourceWhitelist**, **clusterResourceBlacklist** and **namespaceResourceBlacklist** blocks. <br>
   Both blocks have 2 different fields **group** and **kind**. <br>
 
@@ -178,7 +178,7 @@ Restrict our application using **Destinations**. <br>
           server: "*"
       sourceRepos:
         - "*"
-Using the **project-3** with the bellow app will not work because the **destination/namespace** is set to default and the project restricts to dev namespace. <br>
+Using the **project-3** with the bellow app **app-3.yaml** will not work because the **destination/namespace** is set to default and the project restricts to dev namespace. <br>
 
     apiVersion: argoproj.io/v1alpha1
     kind: Application
@@ -194,7 +194,7 @@ Using the **project-3** with the bellow app will not work because the **destinat
         repoURL: https://github.com/rdumitru1/argocd-tutorial.git
       targetRevision: main
 
-    k create -f app-3.yaml
+    kubectl create -f app-3.yaml
     application.argoproj.io/app-3 created
 
     argocd app list
@@ -202,3 +202,31 @@ Using the **project-3** with the bellow app will not work because the **destinat
     argocd/app-3  https://kubernetes.default.svc  default    project-3  Unknown  Unknown  Manual      InvalidSpecError  https://github.com/rdumitru1/argocd-tutorial.git  03-argocd-applications/helm/nginx  main
 
 The error message from the UI is **application destination server 'https://kubernetes.default.svc' and namespace 'default' do not match any of the allowed destinations in project 'project-3'**
+<br>
+Modify the application **app-3.yaml** to use the dev namespace.
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: app-3
+    spec:
+      destination: # Where the application is deployed
+        namespace: dev
+        server: https://kubernetes.default.svc
+      project: project-3
+      source:
+        path: 03-argocd-applications/helm/nginx
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+
+    kubectl create ns dev
+    kubectl apply -f app-3.yaml
+    application.argoproj.io/app-3 configured
+    argocd app list
+    NAME          CLUSTER                         NAMESPACE  PROJECT    STATUS     HEALTH   SYNCPOLICY  CONDITIONS  REPO                                              PATH                               TARGET
+    argocd/app-3  https://kubernetes.default.svc  dev        project-3  OutOfSync  Missing  Manual      <none>      https://github.com/rdumitru1/argocd-tutorial.git  03-argocd-applications/helm/nginx  main
+
+To restrict the application not to run on a specific namespace use the **\!** in front of the namespace name. For this have a look at **project-4.yaml** and **app-4.yaml**.
+<br>
+Restrict our application using resources. <br>
+Look at **project-5.yaml** and **app-5.yaml**
