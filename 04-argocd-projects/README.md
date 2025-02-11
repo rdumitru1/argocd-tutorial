@@ -290,6 +290,7 @@ Create token succeeded for proj:project-7:read-only.
     Token: <generated_token>
 
 To list the applications for project-7 using the generated token <br>
+
     kubectl apply -f app-7.yaml
     application.argoproj.io/app-7 created
 
