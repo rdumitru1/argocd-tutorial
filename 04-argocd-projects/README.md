@@ -160,3 +160,45 @@ Create a new project using **sourceRepos** block to allow all repositories excep
       sourceRepos:
         - "!https://github.com/rdumitru1/argocd-tutorial"       // Except this repository
         - "\*"                                                   // Allow all repositories
+
+Restrict our application using **Destinations**. <br>
+**project-3.yaml** <br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+      name: project-3
+      namespace: argocd
+    spec:
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      destinations:
+        - namespace: "dev"      // Restrict the application to be deployed only to dev namespace.
+          server: "*"
+      sourceRepos:
+        - "*"
+Using the **project-3** with the bellow app will not work because the **destination/namespace** is set to default and the project restricts to dev namespace. <br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: app-3
+    spec:
+      destination: # Where the application is deployed
+        namespace: default
+        server: https://kubernetes.default.svc
+      project: project-3
+      source:
+        path: 03-argocd-applications/helm/nginx
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+      targetRevision: main
+
+    k create -f app-3.yaml
+    application.argoproj.io/app-3 created
+
+    argocd app list
+    NAME          CLUSTER                         NAMESPACE  PROJECT    STATUS   HEALTH   SYNCPOLICY  CONDITIONS        REPO                                              PATH                               TARGET
+    argocd/app-3  https://kubernetes.default.svc  default    project-3  Unknown  Unknown  Manual      InvalidSpecError  https://github.com/rdumitru1/argocd-tutorial.git  03-argocd-applications/helm/nginx  main
+
+The error message from the UI is **application destination server 'https://kubernetes.default.svc' and namespace 'default' do not match any of the allowed destinations in project 'project-3'**
