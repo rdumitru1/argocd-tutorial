@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-7
+spec:
+  destination: # Where the application is deployed
+    namespace: dev
+    server: https://kubernetes.default.svc
+  project: project-7
+  source:
+    path: 03-argocd-applications/helm/nginx
+    repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+    targetRevision: main
