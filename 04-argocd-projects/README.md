@@ -92,7 +92,7 @@ In the default project there are no restrictions, we cab use all repositories, a
 <br>
 <br>
 Create a new project:
-- **project-1.yaml**
+- **project-1.yaml** <br>
 
     apiVersion: argoproj.io/v1alpha1
     kind: AppProject
@@ -110,7 +110,7 @@ Create a new project:
         - "https://github.com/rdumitru1/argocd-tutorial"
   Here we are limiting the project to allow only **https://github.com/rdumitru1/argocd-tutorial** repo.
 Create a new app:
-- **app-1.yaml**
+- **app-1.yaml** <br>
 
     apiVersion: argoproj.io/v1alpha1
     kind: Application
@@ -142,7 +142,7 @@ Change the repoURL to the allowed git repository and redeployit. <br>
         repoURL: https://github.com/rdumitru1/argocd-tutorial.git
         targetRevision: main
 Allowing all repositories except: <br>
-- **project-2.yaml**
+- **project-2.yaml** <br>
 
     apiVersion: argoproj.io/v1alpha1
     kind: AppProject
