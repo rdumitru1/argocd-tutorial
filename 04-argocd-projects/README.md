@@ -282,7 +282,7 @@ Apply the project. <br>
     appproject.argoproj.io/project-7 created
 Generat the token. <br>
 
-argocd proj role create-token project-7 read-only                                                                                                                                                                                        12s
+    argocd proj role create-token project-7 read-only                                                                                                                                                                                        12s
 Create token succeeded for proj:project-7:read-only.
     ID: 73df70cc-af65-4571-99ec-44cf452f846c
     Issued At: 2025-02-11T14:27:35+02:00
