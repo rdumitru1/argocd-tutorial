@@ -141,6 +141,7 @@ Change the repoURL to the allowed git repository and redeployit. <br>
         path: 03-argocd-applications/helm/nginx
         repoURL: https://github.com/rdumitru1/argocd-tutorial.git
         targetRevision: main
+
 Allowing all repositories except: <br>
 - **project-2.yaml** <br>
 
