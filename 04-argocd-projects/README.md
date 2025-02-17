@@ -297,3 +297,51 @@ To list the applications for project-7 using the generated token <br>
     argocd app list --auth-token <generated_token>
     NAME          CLUSTER                         NAMESPACE  PROJECT    STATUS     HEALTH   SYNCPOLICY  CONDITIONS  REPO                                              PATH                               TARGET
     argocd/app-7  https://kubernetes.default.svc  dev        project-7  OutOfSync  Missing  Manual      <none>      https://github.com/rdumitru1/argocd-tutorial.git  03-argocd-applications/helm/nginx  main
+
+Create 2 new apps **app-8.yaml** and **app-9.yaml** using the same **project-7.yaml** project, sync **app-8.yaml** using the admin permissions and try to sync **app-9.yaml** using the generated token. <br>
+
+    kubectl create -f app-8.yaml
+    application.argoproj.io/app-8 created
+
+    kubectl create -f app-9.yaml
+    application.argoproj.io/app-9 created
+
+    argocd app sync app-8   // sync will work
+
+    argocd app sync app-9 --auth-token <generated token>
+    FATA[0000] rpc error: code = PermissionDenied desc = permission denied: applications, sync, project-7/app-9, sub: proj:project-7:read-only, iat: 2025-02-11T12:27:35Z
+
+Modify **project-7.yaml** and add a new policy that allows sync as well. <br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: AppProject
+    metadata:
+    name: project-7
+    namespace: argocd
+    spec:
+      clusterResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      namespaceResourceWhitelist:
+        - group: "*"
+          kind: "*"
+      destinations:
+        - namespace: "*"
+          server: "*"
+      sourceRepos:
+        - "*"
+      roles:
+        - name: read-sync
+          description: "This role can be used only for reading applications."
+          policies:
+            - p, proj:project-7:read-sync, applications, get, project-7/*, allow
+            - p, proj:project-7:read-sync, applications, sync, project-7/*, allow
+Apply the change, generate a new token based on the new role and the new policy and test again the sync using the generated token. <br>
+
+    argocd proj role create-token project-7 read-sync
+    Create token succeeded for proj:project-7:read-sync.
+      ID: a7f8865b-f859-4888-9430-f4e068acb99c
+      Issued At: 2025-02-11T15:46:26+02:00
+      Expires At: Never
+      Token: <generated_token>
+    argocd app sync app-9 --auth-token <generated_token>   // sync will now work

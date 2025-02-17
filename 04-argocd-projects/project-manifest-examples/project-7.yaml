@@ -16,7 +16,8 @@ spec:
   sourceRepos:
     - "*"
   roles:
-    - name: read-only
+    - name: read-sync
       description: "This role can be used only for reading applications."
       policies:
-        - p, proj:project-7:read-only, applications, get, project-7/*, allow
+        - p, proj:project-7:read-sync, applications, get, project-7/*, allow
+        - p, proj:project-7:read-sync, applications, sync, project-7/*, allow
