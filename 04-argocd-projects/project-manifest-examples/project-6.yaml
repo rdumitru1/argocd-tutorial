@@ -9,7 +9,7 @@ spec:
       kind: "*"
   namespaceResourceBlacklist:
     - group: ""
-      kind: "ServiceAccount" # Only this resource can be deployed, all other resources can't be deployed'
+      kind: "ServiceAccount" # Only this resource can't be deployed, all other resources can be deployed
   destinations:
     - namespace: "*"
       server: "*"
