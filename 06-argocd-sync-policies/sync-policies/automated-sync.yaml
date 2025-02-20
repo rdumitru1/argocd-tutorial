@@ -8,7 +8,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: v03-argocd-applications/directoryofmanifests
+    path: 03-argocd-applications/directoryofmanifests
     repoURL: https://github.com/rdumitru1/argocd-tutorial.git
     targetRevision: main
   syncPolicy:
