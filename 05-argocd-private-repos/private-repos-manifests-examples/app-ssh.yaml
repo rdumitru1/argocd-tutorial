@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-ssh-private
+  namespace: argocd
+spec:
+  destination:
+    namespace: default
+    server: "https://kubernetes.default.svc"
+  project: default
+  source:
+    path: 05-argocd-private-repos/applications/helm/nginx
+    repoURL: "git@github.com:rdumitru1/argocd-tutorial-private.git"
+    targetRevision: main

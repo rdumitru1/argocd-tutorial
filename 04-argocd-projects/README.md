@@ -41,7 +41,7 @@ Each applications must belong to a project and by default each application uses 
         namespace: '!dev'
         server: 'https://kubernetes.default.svc'
 
-**Restrict what kinds of objects may or may not be deployed**    (e.g. RBAC, CRDs, DaemonSets, NetworkPolicy etc...) <br>
+**Restrict what kind of objects may or may not be deployed**    (e.g. RBAC, CRDs, DaemonSets, NetworkPolicy etc...) <br>
   To do that we are using **clusterResourceWhitelist**, **namespaceResourceWhitelist**, **clusterResourceBlacklist** and **namespaceResourceBlacklist** blocks. <br>
   Both blocks have 2 different fields **group** and **kind**. <br>
 

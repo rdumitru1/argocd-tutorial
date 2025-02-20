@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-template
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds    # This is import to define
+stringData:
+  type: git
+  url: https://github.com/rdumitru1/
+  username: argocd-private-repo     # name of the token
+  password: token_itself    # the generated token itself
