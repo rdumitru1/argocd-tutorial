@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: application-no-automated-sync
+spec:
+  destination: # Where the application is deployed
+    namespace: no-automated-sync
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    directory:
+      recurse: true
+    path: 03-argocd-applications/directoryofmanifests
+    repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+    targetRevision: main
