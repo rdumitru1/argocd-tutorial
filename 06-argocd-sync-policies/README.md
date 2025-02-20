@@ -53,9 +53,10 @@ Change the replicas from 1 to 3 and refresh the application in UI and you will s
       syncPolicy:           # This is a new directive
         automated: {}       # This means that this application is automated sync
 
+    kubectl create ns automated-sync
     kubectl create -f automated-sync.yaml
 
 If you go to the UI and verify, you will see that the application is automatically synced.
 <br>
-Change the replica back from 3 to 1  and check the UI and see that the application is automatically synced.
+Change the replica back from 3 to 1 and go to UI refresh the app and see that the application is automatically synced.
 <br>
