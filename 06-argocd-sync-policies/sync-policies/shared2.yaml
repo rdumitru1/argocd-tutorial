@@ -1,16 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: selfheal-application
+  name: shared2-application
 spec:
   destination:
-    namespace: selfheal-sync
+    namespace: shared
     server: https://kubernetes.default.svc
   project: default
   source:
     path: 03-argocd-applications/directoryofmanifests
-    repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+    repoURL: https://github.com/rdumitru1/argocd-tutorial.git
     targetRevision: main
   syncPolicy:
-    automated:
-      selfHeal: true
+    syncOptions:
+      - FailOnSharedResource
+    automated: {}

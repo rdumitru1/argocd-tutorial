@@ -12,6 +12,6 @@ spec:
     repoURL: https://github.com/rdumitru1/argocd-tutorial.git
     targetRevision: main
   syncPolicy:
-    syncOptions:
-      - ApplyOutOfSyncOnly=true
+    syncOption:
+      - 
     automated: {}

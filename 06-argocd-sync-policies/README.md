@@ -231,3 +231,119 @@ Modify the **06-argocd-sync-policies/sync-policies/automated-sync.yaml** file an
         automated: {}
 
 In order for this to work, apply the modified file and make a change in the deployment **03-argocd-applications/directoryofmanifests/deployment.yaml**, change the replicas from 1 to 3.
+<br>
+After you refresh the application, check the **Last Sync** status in the UI and under **RESULT** you will see that only the deployment got synced.
+<br>
+2. FailOnSharedResource
+<br>
+By default ArgoCD will apply all manifests found in the git path configured in the application regardless if the resources defined in the yaml files are already applied by another application in the same namespace.
+<br>
+If the **FailOnSharedResource** Sync Option is set, ArgoCD will fail the Sync whenever it finds a resource in the current application that is applied already in the cluster by another application in the same namespace.
+<br>
+**shared1.yaml**
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: shared1-application
+    spec:
+      destination:
+        namespace: shared
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: 03-argocd-applications/directoryofmanifests
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+      syncPolicy:
+        automated: {}
+
+**shared2.yaml**
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: shared2-application
+    spec:
+      destination:
+        namespace: shared
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: 03-argocd-applications/directoryofmanifests
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+      syncPolicy:
+        automated: {}
+
+Deploy the application as they are, and then in the UI you will see that one of them is Synced ok and the second one is OutOfSync and with 3 Warnings.
+<br>
+
+    kubectl create ns shared
+    kubectl apply -f shared1.yaml
+    kubectl apply -f shared2.yaml
+
+In order to fail the sync when you try to deploy the same resources in the same namespace modify the **shared1.yaml** and **shared2.yaml** files and apply the changes.
+<br>
+**shared1.yaml**
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: shared1-application
+    spec:
+      destination:
+        namespace: shared
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: 03-argocd-applications/directoryofmanifests
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+      syncPolicy:
+        syncOptions:
+              - FailOnSharedResource=true
+        automated: {}
+
+**shared2.yaml**
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: shared2-application
+    spec:
+      destination:
+        namespace: shared
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: 03-argocd-applications/directoryofmanifests
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+      syncPolicy:
+        syncOptions:
+          - FailOnSharedResource
+        automated: {}
+
+You will see that one application will have Sync OK and the other one will continue to Sync and fail at one point.
+<br>
+By clicking the application and going to events you will see:
+<br>
+![alt text](image.png)
+
+<br>
+<br>
+
+**Resource Level** and **Application Level**
+<br>
+1. replace Sync Option
+<br>
+By default ArgoCD executes kubectl apply operation to apply the configuration stored in git, in some cases kubectl apply is not suitable.
+<br>
+For example the resource spec might be to big and won't fit into **kubectl.kubernetes.io/last-applied-configuration:**  annotation that is added by kubectl apply.
+<br>
+In this situation you might use **Replace=true** sync option.
+<br>
+If we use the Sync Option at the Application level it means that AgoCD will use **kubectl replace** to all the resources related to this application, but if we use replace at the resource level ArgoCD will use **kubectl replace** only for that resource.
+<br>
+In this file **03-argocd-applications/directoryofmanifests/service.yaml** we are using **argocd.argoproj.io/sync-options: Replace=true** annotation which is applied at the resource level.

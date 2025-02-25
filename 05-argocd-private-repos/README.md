@@ -1,4 +1,4 @@
-## This only works with this repo https://github.com/rdumitru1/argocd-tutorial-private
+## This only works with this repo 
 
 The first method to authenticate Argo with a private git repo is using https and a git token. <br>
 **https-secret.yaml** <br>
