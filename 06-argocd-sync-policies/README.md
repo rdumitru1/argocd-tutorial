@@ -94,3 +94,140 @@ If now we delete again the **03-argocd-applications/directoryofmanifests/service
 <br>
 Get back the deleted **03-argocd-applications/directoryofmanifests/service.yaml** file and in the UI hit a refresh to see that ArgoCD creates automatically the reverted **service.yaml** file.
 <br>
+<br>
+## Self Healing
+<br> <br>
+If we scale the deployment to 10 pods for our **automated-application** (which has Automated Sync only but does not have Auto PRUNE or Auto Self Healing deployment) directly in the CLI, the number of pods will be 10 in the Kubernetes cluster but in the git repo there is only 1.
+<br>
+    kubectl scale deploy/nginx --replicas=10 -n automated-sync
+    kubectl get deploy -n automated-sync
+      NAME    READY   UP-TO-DATE   AVAILABLE   AGE
+      nginx   10/10   10           10          144m
+
+So there are difference between this 2 states, Target State and Live State.
+<br>
+Because of this difference the application in the UI will have 10 pods and it will become OutOfSync and needs to be manually synced to tell ArgoCD to detect the additional pods and terminate the additional pods. So Argo detects that the number of replicas in git is 1 and the number of pods in the live state is 10.
+<br>
+When I click on sync/synchronize, ArgoCD will terminate all additional pods.
+<br>
+I want ArgoCd to do this automatically.
+<br>
+**selfheal-sync.yaml**
+
+    kubectl create ns selfheal-sync
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: selfheal-application
+    spec:
+      destination:
+        namespace: selfheal-sync
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: 03-argocd-applications/directoryofmanifests
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+      syncPolicy:
+        automated:
+          selfHeal: true
+
+Now if you scale again the application to 10 pods, ArgoCD will automatically correct the state of the application in the Kubernetes cluster and it will terminate all the additional pods.
+<br>
+
+    kubectl scale deploy/nginx --replicas=10 -n selfheal-sync
+    kubectl get pods -n selfheal-sync
+
+## Sync Options
+<br>
+
+Some of the Sync Options are used only in Application level, some of them are used on Resource level and some of them can be used in both of them.
+<br>
+
+**Resource Level**
+Sync Options at resource level can be used as annotations.
+<br>
+1. no-prune
+<br>
+
+    metadata:
+      annotations:
+        argocd.argoproj.io/sync-options: Prune=false
+
+I want to prevent a Service Account from being pruned.
+<br>
+In the **03-argocd-applications/directoryofmanifests/serviceaccount.yaml** file add **argocd.argoproj.io/sync-options: Prune=false** annotation.
+<br>
+**03-argocd-applications/directoryofmanifests/serviceaccount.yaml**
+
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: nginx
+      annotations:
+        argocd.argoproj.io/sync-options: Prune=false      # This prevents the Service Account to be pruned.
+      labels:
+        helm.sh/chart: nginx-0.1.0
+        app.kubernetes.io/name: nginx
+        app.kubernetes.io/instance: nginx
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+
+In this location **03-argocd-applications/directoryofmanifests** there are **service.yaml** which doesn't have the **Prune=false** annotation and **seviceaccount.yaml** which has the **Prune=false** annotation.
+<br>
+When both manifests **service.yaml** and **seviceaccount.yaml** will get deleted from the git repository and the application get refreshed, the Service will get pruned bi ArgoCD, but the Service Account will not be pruned by ArgoCD but it will have a trash icon.
+<br>
+1. Disable kubectl validation
+<br>
+**argocd.argoproj.io/sync-options: Validate=false**
+<br>
+
+    metadata:
+      annotations:
+        argocd.argoproj.io/sync-options: Validate=false
+
+This Sync Option disables validation of kubectl.
+<br>
+
+**Application Level**
+<br>
+This Sync Option is used only in ArgoCD Application
+<br>
+
+1. Selective Sync
+<br>
+In ArgoCD when you manually sync an application or it gets automatically synced, ArgoCD doesn't sync only the resources that are OutOfSync it syncs all the resources.
+<br>
+Now I want to tell ArgoCD to sync only the OutOfSync resources.
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    spec:
+      syncPolicy
+        syncOptions:
+          ApplyOutOfSyncOnly=true
+
+Modify the **06-argocd-sync-policies/sync-policies/automated-sync.yaml** file and add the Sync Option.
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: automated-application
+    spec:
+      destination:
+        namespace: automated-sync
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: 03-argocd-applications/directoryofmanifests
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+      syncPolicy:
+        syncOptions:
+          - ApplyOutOfSyncOnly=true         # This enables selective sync
+        automated: {}
+
+In order for this to work, apply the modified file and make a change in the deployment **03-argocd-applications/directoryofmanifests/deployment.yaml**, change the replicas from 1 to 3.

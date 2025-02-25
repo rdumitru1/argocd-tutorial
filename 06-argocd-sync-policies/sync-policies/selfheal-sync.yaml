@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: automated-application
+  name: selfheal-application
 spec:
   destination:
-    namespace: automated-sync
+    namespace: selfheal-sync
     server: https://kubernetes.default.svc
   project: default
   source:
@@ -12,6 +12,5 @@ spec:
     repoURL: https://github.com/rdumitru1/argocd-tutorial.git
     targetRevision: main
   syncPolicy:
-    syncOptions:
-      - ApplyOutOfSyncOnly=true
-    automated: {}
+    automated:
+      selfHeal: true
