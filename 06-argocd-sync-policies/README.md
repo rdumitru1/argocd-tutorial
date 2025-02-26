@@ -308,6 +308,7 @@ In order to fail the sync when you try to deploy the same resources in the same 
 
 **shared2.yaml**
 <br>
+
     apiVersion: argoproj.io/v1alpha1
     kind: Application
     metadata:
@@ -391,13 +392,13 @@ ArgoCD will create the namespace and the labels as well.
 <br>
 By default ArgoCD executes kubectl apply operation to apply the configuration stored in git, in some cases kubectl apply is not suitable.
 <br>
-For example the resource spec might be to big and won't fit into **kubectl.kubernetes.io/last-applied-configuration:**  annotation that is added by kubectl apply.
+For example the resource spec might be to big and won't fit into **kubectl.kubernetes.io/last-applied-configuration\:**  annotation that is added by kubectl apply.
 <br>
-In this situation you might use **Replace=true** sync option.
+In this situation you might use **Replace\=true** sync option.
 <br>
 If we use the Sync Option at the Application level it means that AgoCD will use **kubectl replace** to all the resources related to this application, but if we use replace at the resource level ArgoCD will use **kubectl replace** only for that resource.
 <br>
-In this file **03-argocd-applications/directoryofmanifests/service.yaml** we are using **argocd.argoproj.io/sync-options: Replace=true** annotation which is applied at the resource level.
+In this file **03-argocd-applications/directoryofmanifests/service.yaml** we are using **argocd.argoproj.io/sync-options\: Replace\=true** annotation which is applied at the resource level.
 <br>
 1. PruneLast
 <br>
