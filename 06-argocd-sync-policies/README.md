@@ -307,6 +307,7 @@ In order to fail the sync when you try to deploy the same resources in the same 
         automated: {}
 
 **shared2.yaml**
+<br>
     apiVersion: argoproj.io/v1alpha1
     kind: Application
     metadata:
@@ -335,6 +336,7 @@ By clicking the application and going to events you will see:
 <br>
 I want to create the namespaces automatically before the application syncs.
 <br>
+
 **create-ns.yaml**
 <br>
 
