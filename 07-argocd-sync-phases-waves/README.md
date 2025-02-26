@@ -106,6 +106,7 @@ Sync Waves is the order of deploying the resources into a specific phase.
 
 ## By Kind
 <br>
+
 | Pre-sync   | Sync/wave         | Post-sync  | Sync-fail|
 | :----------| :-----------------| :----------| :------- |
 | Job        | Service 0         | Job        | Job      |
@@ -128,6 +129,7 @@ This priority is used when when phases and waves are equal for multiple resource
 <br>
 Let's say that we have 2 different Service Accounts, the Phase is equal, the Wave is equal, the kind is equal, in this situation ArgoCD will deploy this 2 resources based on their names, in order.
 <br>
+
 | Pre-sync   | Sync/wave         | Post-sync  | Sync-fail|
 | :----------| :-----------------| :----------| :------- |
 | Job        | Service 0         | Job        | Job      |
