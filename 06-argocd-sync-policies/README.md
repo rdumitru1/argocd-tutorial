@@ -331,6 +331,55 @@ By clicking the application and going to events you will see:
 <br>
 ![alt text](image.png)
 
+3. CreateNamespace
+<br>
+I want to create the namespaces automatically before the application syncs.
+<br>
+**create-ns.yaml**
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: create-ns-application
+    spec:
+      destination:
+        namespace: create-ns
+        server: https://kubernetes.default.svc
+      project: default
+      source:
+        path: 03-argocd-applications/directoryofmanifests
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+        targetRevision: main
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated: {}
+
+
+4. Namespace metadata
+<br>
+When you use **CreateNamespace** Sync Option you can use **managedNamespaceMetadata**.
+<br>
+ArgoCD will create the namespace and the labels as well.
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      namespace: test
+    spec:
+      syncPolicy:
+        managedNamespaceMetadata:
+          labels: # The labels to set on the application namespace
+            any: label
+            you: like
+          annotations: # The annotations to set on the application namespace
+            the: same
+            applies: for
+            annotations: on-the-namespace
+        syncOptions:
+        - CreateNamespace=true
 <br>
 <br>
 
@@ -347,3 +396,9 @@ In this situation you might use **Replace=true** sync option.
 If we use the Sync Option at the Application level it means that AgoCD will use **kubectl replace** to all the resources related to this application, but if we use replace at the resource level ArgoCD will use **kubectl replace** only for that resource.
 <br>
 In this file **03-argocd-applications/directoryofmanifests/service.yaml** we are using **argocd.argoproj.io/sync-options: Replace=true** annotation which is applied at the resource level.
+<br>
+1. PruneLast
+<br>
+When I use this Sync Option at the Resource level I say that I want to prune this resource last.
+<br>
+When I use this at the Application level it means that if I have multiple applications this application will be pruned last.

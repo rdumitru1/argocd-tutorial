@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: automated-application
+  name: create-ns-application
 spec:
   destination:
-    namespace: automated-sync
+    namespace: create-ns
     server: https://kubernetes.default.svc
   project: default
   source:
@@ -12,4 +12,6 @@ spec:
     repoURL: https://github.com/rdumitru1/argocd-tutorial.git
     targetRevision: main
   syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
     automated: {}
