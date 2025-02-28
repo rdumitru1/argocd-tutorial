@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: new-cluster-application
+  namespace: argocd
+spec:
+  destination: # Where the application is deployed
+    namespace: external
+    name: external                                              # The name of the new kubernetes cluster returned by the argocd cluster list command
+  project: default
+  source:
+    path: 03-argocd-applications/directoryofmanifests
+    repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+    targetRevision: main
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated: {}
