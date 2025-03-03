@@ -99,3 +99,22 @@ In the above example we are using 3 variables {{cluster}}, {{url}} and {{path}}.
 The goal is generating applications so we are using a generator called **list**.
 <br>
 In the **list** generator we have 2 different elements, so we have 2 different applications.
+<br>
+### Cluster generator
+<br>
+Allows you to target ArgoCD applications to clusters based on the list of clusters defined within and managed by ArgoCD.
+<br>
+In ArgoCD managed clusters are stored within secrets in the ArgoCD namespace.
+<br>
+In the previous lecture we used a secret to add a new Kubernetes cluster to ArgoCD environment, applicationset controller uses those same secrets to generate parameters to identify and target available clusters.
+<br>
+For each cluster registered with ArgoCD the **Cluster Generator** produces parameters based on the list of items found within the cluster secret.
+<br>
+The cluster generator will provide some different parameters that we can use in applicationset manifest related to **Cluster Generator**.
+<br>
+**Parameters**
+**name** - Is equal with stringData.secret from the secret
+**namenormalized** - Normalize to contain only lowercase alpha numerical correctors. Also it will convert underline(_) to dash (-), test_a will become test-a
+**server** - Is equal with stringData.server from the secret
+**metadata.labels.<key>** Is equal with metadata.labels.<key>
+**metadata.annotations.<key>** Is equal with metadata.annotations.<key>
