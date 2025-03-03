@@ -113,8 +113,13 @@ For each cluster registered with ArgoCD the **Cluster Generator** produces param
 The cluster generator will provide some different parameters that we can use in applicationset manifest related to **Cluster Generator**.
 <br>
 **Parameters**
+<br>
 **name** - Is equal with stringData.secret from the secret
+<br>
 **namenormalized** - Normalize to contain only lowercase alpha numerical correctors. Also it will convert underline(_) to dash (-), test_a will become test-a
+<br>
 **server** - Is equal with stringData.server from the secret
+<br>
 **metadata.labels.<key>** Is equal with metadata.labels.<key>
+<br>
 **metadata.annotations.<key>** Is equal with metadata.annotations.<key>
