@@ -129,3 +129,104 @@ The cluster generator will provide some different parameters that we can use in 
 <br>
 
 **metadata.annotations.<key>** Is equal with metadata.annotations.<key>
+<br>
+Since I did not deployed the second cluster in a VM I can't follow this.
+<br>
+
+**cluster-generator-ex1.yaml**
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: ApplicationSet
+    metadata:
+      name: cluster-generator-ex1
+      namespace: argocd
+    spec:
+      generators:
+      - clusters: {}
+      template:
+        metadata:
+          name: '{{name}}-application'
+        spec:
+          project: "default"
+          source:
+            repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+            targetRevision: main
+            path: v03-argocd-applications/helm/nginx
+          destination:
+            server: '{{server}}'
+            namespace: cluster-generator
+          syncPolicy:
+            automated: {}
+            syncOptions:
+              - CreateNamespace=true
+
+In the above file we have 2 variables **{{name}}** and **{{server}}**. This variables come from the output of **argocd cluster list**.
+<br>
+
+    argocd cluster list
+    SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
+    https://kubernetes.default.svc  in-cluster  1.27     Successful
+
+If I would had multiple clusters it would look like this.
+<br>
+
+    argocd cluster list
+    SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
+    https://192.168.64.93:6443      external    1.27     Successful
+    https://kubernetes.default.svc  in-cluster  1.27     Successful
+
+The first variable is **{{name}}**, and name of the first cluster is **in-cluster** so the name of the first application will be **in-cluster-application** and the name of the second application will be **external-application**, if we would have 10 clusters we would had 10 different applications.
+<br>
+
+The second variable is **{{server}}**, where we are defining the server, we are defining the destination.
+<br>
+The server of the first application will be **https://kubernetes.default.svc** and the server for the second application will be **https://192.168.64.93:6443**.
+<br>
+
+    kubectl apply -f cluster-generator-ex1.yaml
+
+Since I have a single kubernetes cluster I only have one application deployed.
+<br>
+
+![alt text](image-1.png)
+
+<br>
+Sometimes I want to deploy my application in some specific cluster in one or more specific clusters.
+<br>
+
+I want application A to be deployed in a cluster that has a specific label, in this situation we can use selectors in Cluster Generator to select some specific clusters for this purpose.
+<br>
+
+**cluster-generator-ex2.yaml**
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: ApplicationSet
+    metadata:
+      name: cluster-generator-ex2
+      namespace: argocd
+    spec:
+      generators:
+      - clusters:
+          selector:
+            matchLabels:                                    # I want my application to be deployed in a cluster that has this 2 labels. This are the labels from the secret 08-argocd-add-cluster/add-cluster/add-cluster-manifest/add-cluster-secret.yaml metadata.labels
+              argocd.argoproj.io/secret-type: cluster
+              environment: staging
+      template:
+        metadata:
+          name: '{{name}}-application'
+        spec:
+          project: "default"
+          source:
+            repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+            targetRevision: main
+            path: 03-argocd-applications/helm/nginx
+          destination:
+            server: '{{server}}'
+            namespace: cluster-generator
+          syncPolicy:
+            automated: {}
+            syncOptions:
+              - CreateNamespace=true
+

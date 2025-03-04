@@ -19,9 +19,9 @@ spec:
     spec:
       project: "default"
       source:
-        repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
         targetRevision: main
-        path: v03-argocd-applications/helm/nginx
+        path: 03-argocd-applications/helm/nginx
       destination:
         server: '{{server}}'
         namespace: prod
