@@ -198,6 +198,31 @@ Sometimes I want to deploy my application in some specific cluster in one or mor
 I want application A to be deployed in a cluster that has a specific label, in this situation we can use selectors in Cluster Generator to select some specific clusters for this purpose.
 <br>
 
+In the add a new cluster lecture we had used the **08-argocd-add-cluster/add-cluster/add-cluster-manifest/add-cluster-secret.yaml** secret, modify it and add the **environment: staging** label
+<br>
+
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: external
+      labels:
+        argocd.argoproj.io/secret-type: cluster       # This is important, it is saying that it is a secret of type cluster.
+        environment: staging                          # This label will be used to target the external kubernetes cluster.
+    type: Opaque
+    stringData:
+      name: external                                  # This can be anything, it represents the NAME field in the output of argocd cluster list
+      server: API_SERVER_ADDRESS                      # This is the API_SERVER_ADDRESS of our new cluster. This is the server: https://ip_address:6443 from ~/.kube/config. Change it accordingly.
+      config: |                                       # config
+        {
+          "bearerToken": "SERVICE_ACCOUNT_TOKEN",     # The generated token for the service account
+          "tlsClientConfig": {
+            "insecure": false,
+            "caData": "BASE64 ENCODED CERTIFICATE"    # The certificate of our new kubernetes cluster. It needs to be base64 encoded.
+          }
+        }
+
+<br>
+
 **cluster-generator-ex2.yaml**
 <br>
 
@@ -210,7 +235,7 @@ I want application A to be deployed in a cluster that has a specific label, in t
       generators:
       - clusters:
           selector:
-            matchLabels:                                    # I want my application to be deployed in a cluster that has this 2 labels. This are the labels from the secret 08-argocd-add-cluster/add-cluster/add-cluster-manifest/add-cluster-secret.yaml metadata.labels
+            matchLabels:                                    # I want my application to be deployed in a cluster that has this 2 labels. This are the labels from the secret 08-argocd-add-cluster/add-cluster/add-cluster-manifest/add-cluster-secret.yaml **metadata.labels**
               argocd.argoproj.io/secret-type: cluster
               environment: staging
       template:
@@ -230,3 +255,176 @@ I want application A to be deployed in a cluster that has a specific label, in t
             syncOptions:
               - CreateNamespace=true
 
+I can't deploy **cluster-generator-ex2.yaml** because I did not created a VM with a new kubernetes cluster.
+<br>
+This **cluster-generator-ex2.yaml** file only targets the external cluster not the local cluster.
+<br>
+
+At this moment you can't target the local cluster because the local cluster does not have a secret, so the **cluster-generator-ex2.yaml** file only applies to external clusters.
+<br>
+In order to target the local cluster as well you will need to create a secret for it as well.
+<br>
+
+**09-argocd-applicationSet-1/local-cluster-secret.yaml**
+<br>
+
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: local
+      labels:
+        argocd.argoproj.io/secret-type: cluster
+        environment: pre-staging                      # Based on this label you can target the local cluster
+    type: Opaque
+    stringData:
+      name: local                                     # This can be anything, it represents the NAME field in the output of argocd cluster list
+      server: https://kubernetes.default.svc          # This is https://kubernetes.default.svc because it refers to the local cluster.
+      config: |                                       # config
+        {
+          "tlsClientConfig": {
+            "insecure": false
+          }
+        }
+
+Applying the above file it creates a secret for the local cluster as well.
+<br>
+Before applying the secret for the local cluster.
+<br>
+
+    argocd cluster list
+    SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
+    https://kubernetes.default.svc  in-cluster  1.27     Successful
+
+    kubectl apply -f local-cluster-secret.yaml
+
+After applying the secret for the local cluster.
+<br>
+
+    argocd cluster list
+    SERVER                          NAME   VERSION  STATUS      MESSAGE  PROJECT
+    https://kubernetes.default.svc  local  1.27     Successful
+
+The **NAME** was changed from **in-cluster** to **local** because of **stingData.name**. At this moment the local cluster has a secret as well and we can target local cluster using **spec.generators.-clusters-selector.matchLabels** to match a label that was set in the secret for the local cluster.
+<br>
+<br>
+
+We can pass additional string key value pairs via the **values** field of the cluster generator.
+<br>
+
+Values added via the **values** field are added as **values.something**
+<br>
+
+**09-argocd-applicationSet-1/cluster-generator/cluster-generator-ex3.yaml**
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: ApplicationSet
+    metadata:
+      name: cluster-generator-ex3
+      namespace: argocd
+    spec:
+      generators:
+      - clusters:
+          selector:
+            matchLabels:
+              environment: staging                                      # This targets the external cluster because the secret was created with this **environment: staging** label.
+          values:
+            path: helm/nginx
+            namespace: staging-ns
+      - clusters:
+          selector:
+            matchLabels:
+              environment: pre-staging                                # This targets the local cluster because the secret was created with this **environment: pre-staging** label.
+          values:
+            path: directoryOfmanifests
+            namespace: pre-staging-ns
+      template:
+        metadata:
+          name: '{{name}}-application'
+        spec:
+          project: "default"
+          source:
+            repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+            targetRevision: main
+            path: 03-argocd-applications/{{values.path}}
+          destination:
+            server: '{{server}}'
+            namespace: '{{values.namespace}}'
+          syncPolicy:
+            automated: {}
+            syncOptions:
+              - CreateNamespace=true
+
+<br>
+
+    kubectl delete -f cluster-generator-ex1.yaml
+    kubectl create -f cluster-generator-ex3.yaml
+
+Since I only have the local cluster it will create only the application for the local cluster.
+<br>
+
+### Git Generator
+I want application A to use **09-argocd-applicationSet-1/git-generator/resources/nginx-helm** as it's source and I want application B to use **09-argocd-applicationSet-1/git-generator/resources/nginx-manifests** as it's source.
+<br>
+The first solution is to create 2 different applications.
+<br>
+
+So application A will use **09-argocd-applicationSet-1/git-generator/resources/nginx-helm** as it source and application B will use **09-argocd-applicationSet-1/git-generator/resources/nginx-manifests** as it's source and that way will have 2 different applications, but it is not ideal.
+<br>
+
+The recommendation is to use **Git Generator** to create a single kubernetes manifest and generate multiple applications based on the directories that we have in this path **/Users/rdumitru/Learning/argocd/argocd1/09-argocd-applicationSet-1/git-generator/resources**.
+<br>
+
+**09-argocd-applicationSet-1/git-generator/directories-subtype/git-generator-ex1.yaml**
+<br>
+<br>
+
+There are 2 subtypes in **Git Generator**, **directory** and **file**.
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: ApplicationSet
+    metadata:
+      name: git-directories-generator-ex1
+      namespace: argocd
+    spec:
+      generators:
+      - git:
+          repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+          revision: main
+          directories:
+          - path: 09-argocd-applicationSet-1/git-generator/resources/*    # Because the path have 2 folders **nginx-helm** and **nginx-manifests** it will create 2 applications.
+      template:
+        metadata:
+          name: '{{path.basename}}-application'                           # This will be **nginx-manifests-application** and **nginx-helm-application**
+        spec:
+          project: default
+          source:
+            repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+            targetRevision: main
+            path: '{{path}}'                          
+          destination:
+            server: https://kubernetes.default.svc                       # The server on which the applications will be deployed.
+            namespace: '{{path.basename}}-ns'                            # this will be *nginx-manifests-ns** and **nginx-helm-ns**
+          syncPolicy:
+            automated: {}
+            syncOptions:
+              - CreateNamespace=true
+
+**09-argocd-applicationSet-1/git-generator/resources/** have 2 folders **nginx-helm** and **nginx-manifests**.
+<br>
+The Git Generator will automatically provide us some different parameters.
+<br>
+The first parameter is **path**.
+<br>
+
+The path of the first application will be **09-argocd-applicationSet-1/git-generator/resources/nginx-manifests**, this is the value related to a key called **path**..
+The path of the second application will be **09-argocd-applicationSet-1/git-generator/resources/nginx-helm**, this is the value related to a key called **path**.
+<br>
+
+The second parameter is **path.basename**.
+<br>
+
+The **path.basename** is the most right path name, so the **path.basename** of **09-argocd-applicationSet-1/git-generator/resources/nginx-manifests** is **nginx-manifests**, and the **path.basename** of **09-argocd-applicationSet-1/git-generator/resources/nginx-helm** is **nginx-helm**.
+<br>
+
+The name of the applications will be **nginx-manifests-application** and **nginx-helm-application**
