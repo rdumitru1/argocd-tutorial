@@ -6,17 +6,17 @@ metadata:
 spec:
   generators:
   - git:
-      repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+      repoURL: https://github.com/rdumitru1/argocd-tutorial.git
       revision: main
       files:
-      - path: v09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json
+      - path: 09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json
   template:
     metadata:
       name: '{{cluster.name}}-application'
     spec:
       project: default
       source:
-        repoURL: https://github.com/devopshobbies/argocd-tutorial.git
+        repoURL: https://github.com/rdumitru1/argocd-tutorial.git
         targetRevision: main
         path: '{{cluster.path}}'
       destination:

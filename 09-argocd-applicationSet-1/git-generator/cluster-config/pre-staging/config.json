@@ -1,9 +1,9 @@
 {
   "cluster": {
-    "owner": "mohammad",
+    "owner": "dmr",
     "name": "pre-staging",
-    "path": "v03-argocd-applications/directoryOfmanifests",
-    "source_type": "directoryOfManifests",
+    "path": "03-argocd-applications/directoryofmanifests",
+    "source_type": "directoryofManifests",
     "address": "https://kubernetes.default.svc",
     "namespace": "pre-staging-ns"
   }

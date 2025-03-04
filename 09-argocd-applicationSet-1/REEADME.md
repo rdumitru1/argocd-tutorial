@@ -380,6 +380,12 @@ The recommendation is to use **Git Generator** to create a single kubernetes man
 
 There are 2 subtypes in **Git Generator**, **directory** and **file**.
 <br>
+<br>
+<br>
+
+**directory subtype**
+<br>
+
 
     apiVersion: argoproj.io/v1alpha1
     kind: ApplicationSet
@@ -433,3 +439,150 @@ The name of the applications will be **nginx-manifests-application** and **nginx
     kubectl apply -f git-generator-ex1.yaml
 
 ![alt text](image-2.png)
+
+<br>
+
+**09-argocd-applicationSet-1/git-generator/directories-subtype/git-generator-ex2.yaml**
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: ApplicationSet
+    metadata:
+      name: git-directories-generator-ex2
+      namespace: argocd
+    spec:
+      generators:
+      - git:
+          repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+          revision: main
+          directories:                                                       # Here we are using 2 different paths but I want to exclude one or more specific paths of the first path.
+          - path: 09-argocd-applicationSet-1/git-generator/resources/*
+          - path: 09-argocd-applicationSet-1/git-generator/resources/nginx-manifests
+            exclude: true                                                    # This will exclude the **09-argocd-applicationSet-1/git-generator/resources/nginx-manifests** path
+      template:
+        metadata:
+          name: '{{path.basename}}-application'
+        spec:
+          project: default
+          source:
+            repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+            targetRevision: main
+            path: '{{path}}'
+          destination:
+            server: https://kubernetes.default.svc
+            namespace: '{{path.basename}}-ns'
+          syncPolicy:
+            automated: {}
+            syncOptions:
+              - CreateNamespace=true
+
+In the above example we are using 2 different path, but I want to exclude one or more specific paths of the first path.
+<br>
+
+    kubectl delete -f git-generator-ex1.yaml
+    kubectl create -f git-generator-ex2.yaml
+
+![alt text](image-3.png)
+<br>
+<br>
+<br>
+
+**git file generator**
+<br>
+
+The git file is the second subtype of the **Git Generator**. The git file subtype generates parameters using the contents of json or yaml file found within a specified repository.
+<br>
+
+**09-argocd-applicationSet-1/git-generator/files-subtype/git-generator-ex1.yaml**
+<br>
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: ApplicationSet
+    metadata:
+      name: git-files-generator-ex1
+      namespace: argocd
+    spec:
+      generators:
+      - git:
+          repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+          revision: main
+          files:                                                                          # We are using **files** instead of **directories**
+          - path: 09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json
+      template:
+        metadata:
+          name: '{{cluster.name}}-application'
+        spec:
+          project: default
+          source:
+            repoURL: https://github.com/rdumitru1/argocd-tutorial.git
+            targetRevision: main
+            path: '{{cluster.path}}'
+          destination:
+            server: '{{cluster.address}}'
+            namespace: '{{cluster.namespace}}'
+          syncPolicy:
+            automated: {}
+            syncOptions:
+              - CreateNamespace=true
+
+We have a path **09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json** which translates to **09-argocd-applicationSet-1/git-generator/cluster-config/staging/config.json** and **09-argocd-applicationSet-1/git-generator/cluster-config/pre-staging/config.json**.
+<br>
+
+In file **09-argocd-applicationSet-1/git-generator/cluster-config/staging/config.json** is the configuration for new cluster.
+<br>
+
+    {
+      "cluster": {
+        "owner": "dmr",
+        "name": "staging",
+        "path": "03-argocd-applications/helm/nginx",
+        "source_type": "helm", 
+        "address": "https://192.168.226.93:6443",
+        "namespace": "staging-ns"
+      }
+    }
+
+In file **09-argocd-applicationSet-1/git-generator/cluster-config/pre-staging/config.json** is the configuration of the local cluster.
+<br>
+
+    {
+      "cluster": {
+        "owner": "dmr",
+        "name": "pre-staging",
+        "path": "03-argocd-applications/directoryOfmanifests",
+        "source_type": "directoryOfManifests",
+        "address": "https://kubernetes.default.svc",
+        "namespace": "pre-staging-ns"
+      }
+    }
+
+So we are using **09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json** to extract all the files, all the config.json files related to **09-argocd-applicationSet-1/git-generator/cluster-config/\*\***.
+<br>
+
+We are using different parameters like, **{{cluster.name}}**, **{{cluster.path}}**, **{{cluster.address}}**, and **{{cluster.namespace}}**.
+<br>
+
+The content of **config.json** are parsed and converted into template parameters like this.
+<br>
+
+    {
+      "cluster": {
+        "owner": "dmr",
+        "name": "pre-staging",
+        "path": "03-argocd-applications/directoryofmanifests",
+        "source_type": "directoryofManifests",
+        "address": "https://kubernetes.default.svc",
+        "namespace": "pre-staging-ns"
+      }
+    }
+
+    {
+      "cluster": {
+        "cluster.owner": "dmr",
+        "cluster.name": "pre-staging",
+        "cluster.path": "03-argocd-applications/directoryofmanifests",
+        "cluster.source_type": "directoryofManifests",
+        "cluster.address": "https://kubernetes.default.svc",
+        "cluster.namespace": "pre-staging-ns"
+      }
+    }
