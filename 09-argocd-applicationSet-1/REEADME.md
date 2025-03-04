@@ -525,7 +525,7 @@ The git file is the second subtype of the **Git Generator**. The git file subtyp
             syncOptions:
               - CreateNamespace=true
 
-We have a path **09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json** which translates to **09-argocd-applicationSet-1/git-generator/cluster-config/staging/config.json** and **09-argocd-applicationSet-1/git-generator/cluster-config/pre-staging/config.json**.
+We have a path **09-argocd-applicationSet-1/git-generator/cluster-config/\*\*/config.json** which translates to **09-argocd-applicationSet-1/git-generator/cluster-config/staging/config.json** and **09-argocd-applicationSet-1/git-generator/cluster-config/pre-staging/config.json**.
 <br>
 
 In file **09-argocd-applicationSet-1/git-generator/cluster-config/staging/config.json** is the configuration for new cluster.
@@ -556,7 +556,7 @@ In file **09-argocd-applicationSet-1/git-generator/cluster-config/pre-staging/co
       }
     }
 
-So we are using **09-argocd-applicationSet-1/git-generator/cluster-config/**/config.json** to extract all the files, all the config.json files related to **09-argocd-applicationSet-1/git-generator/cluster-config/\*\***.
+So we are using **09-argocd-applicationSet-1/git-generator/cluster-config/\*\*/config.json** to extract all the files, all the config.json files related to **09-argocd-applicationSet-1/git-generator/cluster-config/\*\***.
 <br>
 
 We are using different parameters like, **{{cluster.name}}**, **{{cluster.path}}**, **{{cluster.address}}**, and **{{cluster.namespace}}**.
