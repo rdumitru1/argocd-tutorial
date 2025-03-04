@@ -428,3 +428,8 @@ The **path.basename** is the most right path name, so the **path.basename** of *
 <br>
 
 The name of the applications will be **nginx-manifests-application** and **nginx-helm-application**
+<br>
+
+    kubectl apply -f git-generator-ex1.yaml
+
+![alt text](image-2.png)
