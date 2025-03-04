@@ -586,3 +586,10 @@ The content of **config.json** are parsed and converted into template parameters
         "cluster.namespace": "pre-staging-ns"
       }
     }
+
+    kubectl apply -f git-generator-ex1.yaml
+
+Since I don't have deployed a VM with a new kubernetes cluster, only the application for the local cluster will get deployed.
+<br>
+
+![alt text](image-4.png)
