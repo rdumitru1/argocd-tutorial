@@ -94,3 +94,22 @@ This is a [argo-rollouts blue-green deployment](https://github.com/argoproj/argo
 Argo-rollout use the standard kubernetes service resource but with some extra metadata needed for management.
 <br>
 Argo-rollout is very flexible on networking options, you can have different services during a rollout that go only to the new version, only to the old version or both.
+<br>
+<br>
+
+### Install argo-rollout
+<br>
+This is the [argo-rollout installation page](https://argoproj.github.io/argo-rollouts/installation/)
+<br>
+
+    kubectl create namespace argo-rollouts
+    kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
+    curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-darwin-amd64
+    chmod +x ./kubectl-argo-rollouts-darwin-amd64
+    sudo mv ./kubectl-argo-rollouts-darwin-amd64 /usr/local/bin/kubectl-argo-rollouts
+    kubectl argo rollouts version
+
+Argo-rollout has a dashboard as well, to access the dashboard:
+<br>
+
+    kubectl argo rollouts dashboard
