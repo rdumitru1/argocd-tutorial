@@ -78,7 +78,6 @@ Let's imagine that a user wants to run a last minute functional test on the new 
     Argo-rollout includes native integration for several popular providers that you can use in the analysis resources to automatically promote or rollback a rollout.
 
 
-<br
 
 **Argo rollouts** controller will only respond to those changes that happen in rollout sources, it will do nothing for normal deployment resources, this means that I need to migrate my deployments to rollouts if I want to manage them with rollout.
 <br>
