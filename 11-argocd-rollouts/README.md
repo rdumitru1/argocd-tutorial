@@ -64,16 +64,16 @@ Let's imagine that a user wants to run a last minute functional test on the new 
 
 **Components of argo-rollouts**
 - controller
-    This is the main controller that monitors the cluster for events and reacts whenever a resource of type rollout is changed. The controller will read all the details of the rollout and bring the cluster to the same state as described in the rollout definition.
+    - This is the main controller that monitors the cluster for events and reacts whenever a resource of type rollout is changed. The controller will read all the details of the rollout and bring the cluster to the same state as described in the rollout definition.
 - rollout resource
-    Is a custom kubernetes resource introduced and managed by argo-rollout.<br>
-    It's mostly compatible with the native kubernetes deployment resource, but with extra fields that control the stages threshold and methods of advanced deployment methods such as canary and blue-green deployments.
+    - Is a custom kubernetes resource introduced and managed by argo-rollout.<br>
+    - It's mostly compatible with the native kubernetes deployment resource, but with extra fields that control the stages threshold and methods of advanced deployment methods such as canary and blue-green deployments.
 - ingress/service
-    This is the mechanism that traffic from live users enters your cluster and is redirected to the appropriate version.
+    - This is the mechanism that traffic from live users enters your cluster and is redirected to the appropriate version.
 - AnalysisTemplate
-    Analysis is the capability to connect a rollout to your metric provider and define a specific threshold for certain metrics that will decide if an update is successful or not.<br>
-    For each analysis you can define one or more metrics queries along with their expected results.<br>
-    A rollout will progress on it's own if metric queries are good, rollback automatically if metrics show failure, and pause the rollout if metric cannot provide a success or failure answer.
+    - Analysis is the capability to connect a rollout to your metric provider and define a specific threshold for certain metrics that will decide if an update is successful or not.<br>
+    - For each analysis you can define one or more metrics queries along with their expected results.<br>
+    - A rollout will progress on it's own if metric queries are good, rollback automatically if metrics show failure, and pause the rollout if metric cannot provide a success or failure answer.
 - Metric Providers
     Argo-rollout includes native integration for several popular providers that you can use in the analysis resources to automatically promote or rollback a rollout.
 
