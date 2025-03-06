@@ -17,14 +17,14 @@ spec:
         image: micutzu/blue-green
         env:
         - name: html_name
-          value: "app-v1.html"
+          value: "app-v2.html"
         ports:
         - containerPort: 5000
   strategy:
     blueGreen: 
       activeService: rollout-bluegreen-active
       previewService: rollout-bluegreen-preview
-      autoPromotionEnabled: false
+      # autoPromotionEnabled: false
       # abortScaleDownDelaySeconds: 10
       # autoPromotionEnabled: false
       # scaleDownDelaySeconds: 60
