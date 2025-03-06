@@ -237,3 +237,53 @@ Because the host is blue-green.demo, please add **127.0.0.1       blue-green.dem
       ingress.networking.k8s.io/blue-green-ingress created
 
 Now access **http://blue-green.demo** in the browser.
+<br>
+![alt text](image.png)
+<br>
+Now to see the replicaset
+<br>
+
+    k get rs -n blue-green
+      NAME                               DESIRED   CURRENT   READY   AGE
+      blue-green-deployment-57b948686d   4         4         4       106s 
+
+At this moment bot **active** and **preview** services have the **app: blue-green-deployment** selector, but in this situation for the first version of the application **argo-rollouts controller** is responsible to add a selector to this services.
+<br>
+
+    k get svc -n blue-green
+      NAME                        TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)    AGE
+      rollout-bluegreen-active    ClusterIP   10.96.14.84   <none>        5000/TCP   5m38s
+      rollout-bluegreen-preview   ClusterIP   10.96.63.34   <none>        5000/TCP   5m38s
+
+    k get svc rollout-bluegreen-active -n blue-green -o yaml
+      apiVersion: v1
+      kind: Service
+      metadata:
+        annotations:
+          argo-rollouts.argoproj.io/managed-by-rollouts: blue-green-deployment
+          kubectl.kubernetes.io/last-applied-configuration: |
+            {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"rollout-bluegreen-active","namespace":"blue-green"},"spec":{"ports":[{"port":5000,"protocol":"TCP","targetPort":5000}],"selector":{"app":"blue-green-deployment"}}}
+        creationTimestamp: "2025-03-06T10:05:30Z"
+        name: rollout-bluegreen-active
+        namespace: blue-green
+        resourceVersion: "1615095"
+        uid: 96020c69-4e39-4e93-8d20-c46e6f200cbe
+      spec:
+        clusterIP: 10.96.14.84
+        clusterIPs:
+        - 10.96.14.84
+        internalTrafficPolicy: Cluster
+        ipFamilies:
+        - IPv4
+        ipFamilyPolicy: SingleStack
+        ports:
+        - port: 5000
+          protocol: TCP
+          targetPort: 5000
+        selector:
+          app: blue-green-deployment
+          rollouts-pod-template-hash: 57b948686d      # This is the selector added by the **argo-rollouts controller**, **57b948686d** is the hash of the above replicaset
+        sessionAffinity: None
+        type: ClusterIP
+      status:
+        loadBalancer: {}
