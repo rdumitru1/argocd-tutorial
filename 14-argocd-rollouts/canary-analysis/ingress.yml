@@ -1,17 +1,18 @@
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: blue-green-ingress
+  name: rolling-update
 spec:
   ingressClassName: nginx
   rules:
-  - host: blue-green.demo
+  - host: rollouts-setweight.demo
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: rollout-bluegreen-active
+            name: rollouts-setweight
             port:
               number: 5000
