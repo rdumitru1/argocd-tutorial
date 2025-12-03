@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     helm:
-      releaseName: application-from-helm
+      # releaseName: application-from-helm
       # parameters:
       #   - name: "replicaCount"
       #     value: "3"
