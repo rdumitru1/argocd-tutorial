@@ -14,7 +14,7 @@ spec:
       #   - name: "replicaCount"
       #     value: "3"
       valueFiles:
-        - custom-values.yaml
+        - values.yaml
     path: 03-argocd-applications/helm/nginx
     repoURL: https://github.com/rdumitru1/argocd-tutorial.git
     targetRevision: main
