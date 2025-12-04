@@ -9,7 +9,10 @@ spec:
   project: default
   source:
     directory:
-      recurse: true
+      # exclude: 'serviceaccount.yaml' # Excludes the file from beeing deployed
+      # include: 'serviceaccount.yaml' # Only deploys the serviceaccount.yaml file.
+      include: '{serviceaccount.yaml,service.yaml}' # Deploys only this 2 yaml files.
+      recurse: true # This deploys all yaml files that are in subdirectories of the path (03-argocd-applications/directoryofmanifests)
     path: 03-argocd-applications/directoryofmanifests
     repoURL: https://github.com/rdumitru1/argocd-tutorial.git
     targetRevision: main

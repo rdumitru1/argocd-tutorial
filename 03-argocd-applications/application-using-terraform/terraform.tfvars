@@ -1,5 +1,5 @@
 username              = "admin"
-password              = "NfpgJVBed0pt66Iz"
+password              = "WcfeABFsyBG6UWdG"
 server_addr           = "darkscience.local"
 namespace             = "argocd"
 repo_url              = "https://github.com/rdumitru1/argocd-tutorial.git"
